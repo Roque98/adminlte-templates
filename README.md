@@ -27,25 +27,46 @@ Template de proyecto ASP.NET Core 6.0 con AdminLTE y Dapper configurado para SQL
 ## Estructura del Proyecto
 
 - **Controllers**: Controladores MVC (ejemplo: HomeController)
-- **Dapper**: Configuración y repositorios de Dapper
-  - **DapperContext**: Clase para crear conexiones a la base de datos
-  - **Entidades**: Clases de dominio
-  - **Interfaces**: Interfaces de repositorios
-  - **Repositorios**: Implementaciones de repositorios
+- **Dapper**: Configuración y repositorios de acceso a datos
+  - **DapperContext.cs**: Clase para crear conexiones a la base de datos
+  - Cada tabla tiene su propia carpeta con:
+    - Entidad (modelo de datos)
+    - Interfaz del repositorio
+    - Implementación del repositorio
 - **Views**: Vistas Razor (Home y Shared con layout AdminLTE)
 - **wwwroot**: Archivos estáticos, incluyendo AdminLTE
+- **docs**: Documentación del proyecto
 
 ## Uso de Dapper
 
-El proyecto incluye ejemplos de repositorios con Dapper. Para agregar tus propios repositorios:
+Este template organiza los archivos de Dapper **por entidad** en lugar de por tipo. Cada tabla de la base de datos tiene su propia carpeta.
 
-1. Crea tu entidad en `Dapper/Entidades`
-2. Crea la interfaz en `Dapper/Interfaces`
-3. Implementa el repositorio en `Dapper/Repositorios`
-4. Registra el servicio en `Program.cs`:
+### Estructura ejemplo:
+```
+Dapper/
+├── DapperContext.cs
+├── Cliente/
+│   ├── ClienteEntidad.cs
+│   ├── IClienteRepository.cs
+│   └── ClienteRepositorio.cs
+└── Producto/
+    ├── ProductoEntidad.cs
+    ├── IProductoRepository.cs
+    └── ProductoRepositorio.cs
+```
+
+### Pasos para agregar una nueva entidad:
+
+1. Crea una carpeta para tu entidad: `Dapper/NombreEntidad/`
+2. Crea la clase entidad: `NombreEntidadEntidad.cs`
+3. Crea la interfaz del repositorio: `INombreEntidadRepository.cs`
+4. Implementa el repositorio: `NombreEntidadRepositorio.cs`
+5. Registra el servicio en `Program.cs`:
    ```csharp
-   builder.Services.AddScoped<ITuRepositorio, TuRepositorio>();
+   builder.Services.AddScoped<IClienteRepository, ClienteRepositorio>();
    ```
+
+📖 **Para más detalles, consulta la documentación completa en:** [`docs/DAPPER_STRUCTURE.md`](docs/DAPPER_STRUCTURE.md)
 
 ## Licencia
 
