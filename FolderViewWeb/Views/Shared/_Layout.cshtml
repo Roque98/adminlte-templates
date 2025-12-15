@@ -1,6 +1,3 @@
-@using FolderView.Dapper.AdministracionBot.Interfaces
-@inject IMenuNavegacionRepository _menuRepository
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -268,89 +265,6 @@
         <!-- sidebar: style can be found in sidebar.less -->
         <section class="sidebar">
 
-            @{
-                var currentPath = Context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
-                var menus = await _menuRepository.GetMenuHierarchyAsync();
-
-                // Helper para verificar si un menú está activo
-                bool IsMenuActive(FolderView.Dapper.AdministracionBot.Entidades.MenuNavegacionEntidad menu)
-                {
-                    if (menu.Controlador != null)
-                    {
-                        var controllerPath = "/" + menu.Controlador.ToLowerInvariant();
-                        return currentPath.StartsWith(controllerPath);
-                    }
-                    if (menu.Url != null && menu.Url != "#")
-                    {
-                        return currentPath.StartsWith(menu.Url.ToLowerInvariant());
-                    }
-                    return false;
-                }
-
-                // Helper para verificar si algún hijo está activo
-                bool IsAnyChildActive(FolderView.Dapper.AdministracionBot.Entidades.MenuNavegacionEntidad menu)
-                {
-                    if (menu.SubMenus == null || !menu.SubMenus.Any()) return false;
-                    return menu.SubMenus.Any(m => IsMenuActive(m) || IsAnyChildActive(m));
-                }
-
-                // Helper para generar URL
-                string GenerateUrl(FolderView.Dapper.AdministracionBot.Entidades.MenuNavegacionEntidad menu)
-                {
-                    if (!string.IsNullOrEmpty(menu.Url) && menu.Url != "#")
-                    {
-                        return menu.Url;
-                    }
-                    if (!string.IsNullOrEmpty(menu.Controlador) && !string.IsNullOrEmpty(menu.Accion))
-                    {
-                        return Url.Action(menu.Accion, menu.Controlador);
-                    }
-                    return "#";
-                }
-
-                // Helper para renderizar un menú recursivamente
-                void RenderMenuItem(FolderView.Dapper.AdministracionBot.Entidades.MenuNavegacionEntidad menu)
-                {
-                    if (menu.EsHeader)
-                    {
-                        <li class="header">@menu.Titulo</li>
-                    }
-                    else if (menu.EsTreeview)
-                    {
-                        var isActive = IsAnyChildActive(menu);
-                        var activeClass = isActive ? "active menu-open" : "";
-                        <li class="treeview @activeClass">
-                            <a href="#">
-                                <i class="fa @menu.Icono"></i> <span>@menu.Titulo</span>
-                                <span class="pull-right-container">
-                                    <i class="fa fa-angle-left pull-right"></i>
-                                </span>
-                            </a>
-                            @if (menu.SubMenus != null && menu.SubMenus.Any())
-                            {
-                                <ul class="treeview-menu">
-                                    @foreach (var submenu in menu.SubMenus.OrderBy(m => m.Orden))
-                                    {
-                                        RenderMenuItem(submenu);
-                                    }
-                                </ul>
-                            }
-                        </li>
-                    }
-                    else
-                    {
-                        var isActive = IsMenuActive(menu);
-                        var activeClass = isActive ? "active" : "";
-                        var url = GenerateUrl(menu);
-                        <li class="@activeClass">
-                            <a href="@url">
-                                <i class="fa @menu.Icono"></i> <span>@menu.Titulo</span>
-                            </a>
-                        </li>
-                    }
-                }
-            }
-
             <!-- Sidebar user panel (optional) -->
             <div class="user-panel">
                 <div class="pull-left image">
@@ -362,13 +276,27 @@
                     <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
                 </div>
             </div>
-            <!-- /.search form -->
+
             <!-- Sidebar Menu -->
             <ul class="sidebar-menu" data-widget="tree">
-                @foreach (var menu in menus.OrderBy(m => m.Orden))
-                {
-                    RenderMenuItem(menu);
-                }
+                <li class="header">MAIN NAVIGATION</li>
+                <li class="active">
+                    <a href="@Url.Action("Index", "Home")">
+                        <i class="fa fa-dashboard"></i> <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-folder"></i> <span>Examples</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><a href="#"><i class="fa fa-circle-o"></i> Example 1</a></li>
+                        <li><a href="#"><i class="fa fa-circle-o"></i> Example 2</a></li>
+                    </ul>
+                </li>
             </ul>
             <!-- /.sidebar-menu -->
         </section>
